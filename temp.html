@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+<script>
+   async function fetchData() {
+        const API_KEY = '4PE33W2L5YY3MDFM54GARMNVD';
+      const apiUrl = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/19.0896,72.8656?key=4PE33W2L5YY3MDFM54GARMNVD`;
+
+      const response = await fetch(apiUrl);
+
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      console.log(data);
+
+    }
+
+    fetchData();
+</script>
+</body>
+</html>
