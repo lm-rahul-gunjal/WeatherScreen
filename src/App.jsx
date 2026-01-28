@@ -31,7 +31,6 @@ function infoBox({ title, icon, value, unit }) {
 }
 
 function hourItem({ time, desc, icon, temp, active}) {
-  // derive display icon from description when icon not provided
   const descLower = (desc || '').toLowerCase();
   const derivedIcon =  icon ||
     (descLower.includes('snow') ? snowyIcon :
@@ -43,13 +42,6 @@ function hourItem({ time, desc, icon, temp, active}) {
      loadingIcon)
     );
 
-  // // temperature template: add context emoji for very cold / very hot
-  // const tempLabel = (() => {
-  //   if (typeof temp !== 'number') return `${temp}°`;
-  //   if (temp <= 0) return `❄️ ${temp}°`;
-  //   if (temp >= 30) return `🔥 ${temp}°`;
-  //   return `${temp}°`;
-  // })();
 
   return (
     <div className={`hour-item ${active ? "active" : ""}`}>
@@ -102,13 +94,11 @@ function App() {
     ]
   });
 
-  const [loading, setLoading] = useState(false);
-  // const [error, setError] = useState(null);
-
-  // Function to get city and country from coordinates via reverse geocoding
+  const [coords, setCoords] = useState(null);
+ 
   const getLocationName = async (latitude, longitude) => {
     try {
-      const geoUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`;
+const geoUrl = `/geo/reverse?format=json&lat=${latitude}&lon=${longitude}`;
       const response = await fetch(geoUrl, {
         headers: {
           'User-Agent': 'weatherscreen-app'
@@ -130,15 +120,11 @@ function App() {
   };
 
   const fetchWeatherData = async (latitude, longitude) => {
-    setLoading(true);
-    // setError(null);
-    
+   
     try {
-      // VisualCrossing Timeline API
-      // Paste your API key below (or replace with env var)
+   
       const API_KEY = '4PE33W2L5YY3MDFM54GARMNVD';
-      const apiUrl = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${latitude},${longitude}?unitGroup=metric&key=${API_KEY}`;
-      // https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/19.0896,72.8656?key=4PE33W2L5YY3MDFM54GARMNVD
+      const apiUrl = `/api/VisualCrossingWebServices/rest/services/timeline/${latitude},${longitude}?unitGroup=metric&key=${API_KEY}`;
 
       const response = await fetch(apiUrl);
 
@@ -148,12 +134,10 @@ function App() {
 
       const data = await response.json();
 
-      // Map VisualCrossing response to our state shape
       const current = data.currentConditions || {};
       const today = Array.isArray(data.days) && data.days.length ? data.days[0] : null;
       const hours = (today && Array.isArray(today.hours)) ? today.hours : [];
 
-      // Find current hour index based on current time
       const now = new Date();
       const currentHour = now.getHours();
       let currentHourIndex = hours.findIndex(h => {
@@ -161,12 +145,10 @@ function App() {
         return hTime === currentHour;
       });
       
-      // If exact hour not found, default to 0; adjust if past most hours
       if (currentHourIndex < 0) {
         currentHourIndex = Math.min(currentHour, Math.max(0, hours.length - 3));
       }
 
-      // Helper function to format time as 12-hour with AM/PM
       const formatTime12 = (datetime24) => {
         if (!datetime24) return '--:-- --';
         const [hour, minute] = datetime24.split(':');
@@ -177,7 +159,6 @@ function App() {
         return `${hour12}:${m} ${ampm}`;
       };
 
-      // Map next 3 hours from current time
       const mappedHourly = [0, 1, 2].map(offset => {
         const h = hours[currentHourIndex + offset+1] || {};
         return {
@@ -189,11 +170,9 @@ function App() {
         };
       });
 
-      // Get location name from coordinates if API doesn't provide it
       let locationName = data.resolvedAddress;
-      // if (!locationName) {
-        locationName = await getLocationName(latitude, longitude);
-      // }
+      locationName = await getLocationName(latitude, longitude);
+      
 
       setWeatherData(prevState => ({
         ...prevState,
@@ -207,11 +186,8 @@ function App() {
         hourlyForecast: mappedHourly.length ? mappedHourly : prevState.hourlyForecast
       }));
     } catch (err) {
-      // setError(err.message);
       console.error('Error fetching weather data:', err);
-    } finally {
-      setLoading(false);
-    }
+    } 
   };
 
   useEffect(() => {
@@ -219,6 +195,8 @@ function App() {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
+          console.log('User coordinates:', latitude, longitude);
+          setCoords({ latitude, longitude });
           fetchWeatherData(latitude, longitude);
         },
         (err) => {
@@ -227,6 +205,20 @@ function App() {
       );
     }
   }, []);
+
+  useEffect(() => {
+    if (!coords) return;
+
+    const interval = setInterval(() => {
+      console.log('Auto-fetching weather data...');
+      fetchWeatherData(coords.latitude, coords.longitude);
+    }, 30 * 60 * 1000); 
+
+    return () => clearInterval(interval);
+  }, [coords]);
+
+
+  
 
   return (
     <>
@@ -258,8 +250,7 @@ function App() {
           {weatherData.hourlyForecast[2] && hourItem(weatherData.hourlyForecast[2], false)}
         </div>
 
-        {loading && <div className="loading">Loading weather data...</div>}
-        {/* {error && <div className="error">Error: {error}</div>} */}
+       
       </div>
     </>
   )

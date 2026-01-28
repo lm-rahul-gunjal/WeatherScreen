@@ -31,7 +31,7 @@ body {
 
 .weather-page {
   width: 100%;
-  max-width: 900px;      /* 🎯 DESIGN SIZE */
+  max-width: 900px;      
   min-width: 0;
   margin: 0 auto;
 
@@ -246,6 +246,20 @@ body {
 .info-unit {
   font-size: 0.8em;
   font-weight: 500;
-  opacity: 0.8;
+  opacity: 0.8; 
   margin-left: 0.2em;
+}
+
+@media (min-width: 1200px) {
+  .weather-page,
+  .info-boxes {
+    max-width: 1200px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .weather-page,
+  .info-boxes {
+    max-width: 1400px;
+  }
 }
