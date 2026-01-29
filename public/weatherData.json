@@ -1,0 +1,46 @@
+{
+  "day": "Today",
+  "location": "Mumbai, India",
+  "condition": "Clear sky",
+  "temperature": 23,
+  "windSpeed": {
+    "title": "Wind Speed",
+    "value": 15,
+    "unit": " km/h"
+  },
+  "humidity": {
+    "title": "Humidity",
+    "value": 78,
+    "unit": " %"
+  },
+  "uvIndex": {
+    "title": "UV Index",
+    "value": 5,
+    "unit": ""
+  },
+  "visibility": {
+    "title": "Visibility",
+    "value": 10,
+    "unit": " km"
+  },
+  "hourlyForecast": [
+    {
+      "time": "12:00",
+      "desc": "Snow",
+      "temp": 16,
+      "active": false
+    },
+    {
+      "time": "14:00",
+      "desc": "Rain",
+      "temp": 11,
+      "active": true
+    },
+    {
+      "time": "16:00",
+      "desc": "Cloudy",
+      "temp": 22,
+      "active": false
+    }
+  ]
+}
