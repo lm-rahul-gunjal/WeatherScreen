@@ -30,17 +30,8 @@ function infoBox({ title, icon, value, unit }) {
   )
 }
 
-function saveLocation(latitude, longitude,city,country) {
-  localStorage.setItem("user_location", JSON.stringify({ latitude, longitude, city, country,timestamp: Date.now() }));
-}
 
-function getSavedLocation() {
-  const locationData = localStorage.getItem("user_location");
-  if (locationData) {
-    return JSON.parse(locationData);
-  }
-  return null;
-}
+
 function hourItem({ time, desc, icon, temp, active}) {
   const descLower = (desc || '').toLowerCase();
   const derivedIcon =  icon ||
@@ -122,8 +113,6 @@ const geoUrl = `/geo/reverse?format=json&lat=${latitude}&lon=${longitude}`;
         const country = data.address?.country || 'Unknown Country';
         const result = `${city}, ${country}`;
         console.log('Formatted location:', result);
-        saveLocation(latitude, longitude, city, country);
-        console.log('Location saved to localStorage.');
         return result;
       }
     } catch (err) {
@@ -184,24 +173,7 @@ const geoUrl = `/geo/reverse?format=json&lat=${latitude}&lon=${longitude}`;
       });
 
       let locationName = data.resolvedAddress;
-
-      const savedLocation = getSavedLocation();
-      console.log('Saved location from localStorage:', savedLocation);
-
-
-      if(savedLocation !== null ){
-        console.log(`Using saved location: ${savedLocation.city}, ${savedLocation.country}`);
-        // setWeatherData(prevState => ({
-        //   ...prevState,
-        //   location: `${savedLocation.city}, ${savedLocation.country}`
-        // }));
-
-        locationName = `${savedLocation.city}, ${savedLocation.country}`;
-      }else{
-
-        locationName = await getLocationName(latitude, longitude);
-      }
-
+      locationName = await getLocationName(latitude, longitude);
       
 
       setWeatherData(prevState => ({
@@ -221,17 +193,7 @@ const geoUrl = `/geo/reverse?format=json&lat=${latitude}&lon=${longitude}`;
   };
 
   useEffect(() => {
-
-    const savedLocation = getSavedLocation();
-    console.log('Saved location from localStorage:', savedLocation);
-
-    if (savedLocation !== null) {
-      const { latitude, longitude } = savedLocation;
-      console.log('Using saved location:', latitude, longitude);
-      setCoords({ latitude, longitude });
-      fetchWeatherData(latitude, longitude);
-    }
-      else  if (navigator.geolocation) {
+    if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
@@ -243,8 +205,7 @@ const geoUrl = `/geo/reverse?format=json&lat=${latitude}&lon=${longitude}`;
           console.error('Geolocation error:', err);
         }
       );
-    
-  }
+    }
   }, []);
 
   useEffect(() => {
@@ -253,7 +214,7 @@ const geoUrl = `/geo/reverse?format=json&lat=${latitude}&lon=${longitude}`;
     const interval = setInterval(() => {
       console.log('Auto-fetching weather data...');
       fetchWeatherData(coords.latitude, coords.longitude);
-    }, 15 * 60 * 1000); 
+    }, 30 * 60 * 1000); 
 
     return () => clearInterval(interval);
   }, [coords]);
