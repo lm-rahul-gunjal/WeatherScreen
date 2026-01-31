@@ -135,7 +135,7 @@ body {
 
   display: flex;
   gap: clamp(0.6rem, 1.5vw, 1.2rem);
-  margin-top: 20px;
+  margin-top: 1.5rem;
 }
 
 .hour-item {
@@ -265,3 +265,35 @@ body {
 }
 
 
+@media screen
+  and (min-width: 1000px) and (max-width: 1300px)
+  and (min-height: 1800px)
+  /* and (max-aspect-ratio: 9 / 16) { */
+{
+  html {
+    font-size: 270%;
+  }
+
+  body,
+  #root {
+    width: 100%;
+    height: 100%;
+  } 
+}
+
+
+@media screen
+  and (min-width: 1800px)
+  and (min-height: 900px)
+  and (max-aspect-ratio: 16/ 9) {
+
+  html {
+    font-size: 170%;
+  }
+
+  body,
+  #root {
+    width: 100%;
+    height: 100%;
+  } 
+}

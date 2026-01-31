@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import './App-1080x1920.css'
 import cloudy from './assets/sun.png'
 import humidityIcon from './assets/humidity.png'
 import uvIcon from './assets/uv-index.png'
